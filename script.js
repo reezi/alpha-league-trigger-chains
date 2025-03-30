@@ -102,8 +102,16 @@ function addControlZooming(svg, g, state) {
     const wheelFactor = 1.25
     const scaleFactor = e.wheelDeltaY < 0 ? wheelFactor : 1 / wheelFactor
 
-    // scale the viewbox
+    // get info
     const vb = svg.viewBox.baseVal
+    const cursorPx = { x: e.clientX, y: e.clientY }
+    const cursorSvg = px2svg(svg, cursorPx)
+
+    // scale the viewbox while keeping cursor in place
+    let dx = (cursorSvg.x - vb.x) * scaleFactor
+    let dy = (cursorSvg.y - vb.y) * scaleFactor
+    vb.x = cursorSvg.x - dx
+    vb.y = cursorSvg.y - dy
     vb.width *= scaleFactor
     vb.height *= scaleFactor
   })
