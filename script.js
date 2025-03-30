@@ -43,6 +43,18 @@ async function main() {
   // viewport covers 100% of div
   dom_svg.setAttribute("width", "100%")
   dom_svg.setAttribute("height", "100%")
+
+  // viewbox is the same screen size as viewport
+  // we define viewbox "x y w h" from svg size
+  const vp = dom_g.getBBox({ fill: true, stroke: true, markers: true, clipped: true })
+  const vb = {
+    x: vp.x,
+    y: vp.y,
+    w: vp.width,
+    h: vp.height
+  }
+  dom_svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.w} ${vb.h}`)
+  dom_svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
 }
 
 // when dom is loaded execute js
