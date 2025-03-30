@@ -21,6 +21,28 @@ async function getMMD() {
   return mmd
 }
 
+//////////////////////////////////////////////
+//////////////// svg handling ////////////////
+//////////////////////////////////////////////
+
+function fitGraphToPage(svg, g) {
+    // viewport covers 100% of div
+    svg.setAttribute("width", "100%")
+    svg.setAttribute("height", "100%")
+
+    // viewbox is the same screen size as viewport
+    // we define viewbox "x y w h" from svg size
+    const vp = g.getBBox({ fill: true, stroke: true, markers: true, clipped: true })
+    const vb = {
+      x: vp.x,
+      y: vp.y,
+      w: vp.width,
+      h: vp.height
+    }
+    svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.w} ${vb.h}`)
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
+}
+
 ////////////////////////////////////////////
 //////////////// main logic ////////////////
 ////////////////////////////////////////////
@@ -40,21 +62,8 @@ async function main() {
   const dom_svg = document.querySelector('div#diagram svg')
   const dom_g = document.querySelector("div#diagram svg g")
 
-  // viewport covers 100% of div
-  dom_svg.setAttribute("width", "100%")
-  dom_svg.setAttribute("height", "100%")
-
-  // viewbox is the same screen size as viewport
-  // we define viewbox "x y w h" from svg size
-  const vp = dom_g.getBBox({ fill: true, stroke: true, markers: true, clipped: true })
-  const vb = {
-    x: vp.x,
-    y: vp.y,
-    w: vp.width,
-    h: vp.height
-  }
-  dom_svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.w} ${vb.h}`)
-  dom_svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
+  // initialize viewbox to see entire graph
+  fitGraphToPage(dom_svg, dom_g)
 }
 
 // when dom is loaded execute js
