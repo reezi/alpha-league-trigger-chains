@@ -43,35 +43,38 @@ function fitGraphToPage(svg, g) {
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
 }
 
+function px2svg(svg, point) {
+  const pointPx = new DOMPoint(point.x, point.y)
+  const pointSvg = pointPx.matrixTransform(svg.getScreenCTM().inverse())
+  return pointSvg
+}
+
 /////////////////////////////////////////
 //////////////// panning ////////////////
 /////////////////////////////////////////
 
 function addControlPanning(svg) {
   let isDragging = false
-  let startX, startY
+  let startPointSvg = null
   let vb = svg.viewBox.baseVal
 
   // panning: grab
   svg.addEventListener('mousedown', function (e) {
     isDragging = true
-    startX = e.clientX
-    startY = e.clientY
     svg.style.cursor = 'grabbing'
+    const cursorPx = { x: e.clientX, y: e.clientY }
+    startPointSvg = px2svg(svg, cursorPx)
   })
 
   // panning: move
   svg.addEventListener('mousemove', function (e) {
     if (!isDragging) return
-
-    let dx = (startX - e.clientX)
-    let dy = (startY - e.clientY)
-
-    vb.x += dx
-    vb.y += dy
-
-    startX = e.clientX
-    startY = e.clientY
+    const cursorPx = { x: e.clientX, y: e.clientY }
+    const cursorSvg = px2svg(svg, cursorPx)
+    const dx = cursorSvg.x - startPointSvg.x
+    const dy = cursorSvg.y - startPointSvg.y
+    vb.x -= dx
+    vb.y -= dy
   })
 
   // panning: release
