@@ -90,6 +90,25 @@ function addControlPanning(svg) {
   })
 }
 
+/////////////////////////////////////////
+//////////////// zooming ////////////////
+/////////////////////////////////////////
+
+function addControlZooming(svg, g, state) {
+  svg.addEventListener('wheel', function (e) {
+    e.preventDefault()
+
+    // zoom settings for user input
+    const wheelFactor = 1.25
+    const scaleFactor = e.wheelDeltaY < 0 ? wheelFactor : 1 / wheelFactor
+
+    // scale the viewbox
+    const vb = svg.viewBox.baseVal
+    vb.width *= scaleFactor
+    vb.height *= scaleFactor
+  })
+}
+
 ////////////////////////////////////////////
 //////////////// main logic ////////////////
 ////////////////////////////////////////////
@@ -114,6 +133,7 @@ async function main() {
 
   // interactivity
   addControlPanning(dom_svg)
+  addControlZooming(dom_svg)
 }
 
 // when dom is loaded execute js
