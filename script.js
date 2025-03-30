@@ -38,6 +38,11 @@ async function main() {
   const dom_div = document.querySelector('div#diagram')
   dom_div.innerHTML = svg
   const dom_svg = document.querySelector('div#diagram svg')
+  const dom_g = document.querySelector("div#diagram svg g")
+
+  // viewport covers 100% of div
+  dom_svg.setAttribute("width", "100%")
+  dom_svg.setAttribute("height", "100%")
 }
 
 // when dom is loaded execute js

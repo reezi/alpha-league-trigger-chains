@@ -1,0 +1,19 @@
+/* disable scrollbars */
+body {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* occupy all the space */
+div#diagram {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
