@@ -43,6 +43,50 @@ function fitGraphToPage(svg, g) {
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
 }
 
+/////////////////////////////////////////
+//////////////// panning ////////////////
+/////////////////////////////////////////
+
+function addControlPanning(svg) {
+  let isDragging = false
+  let startX, startY
+  let vb = svg.viewBox.baseVal
+
+  // panning: grab
+  svg.addEventListener('mousedown', function (e) {
+    isDragging = true
+    startX = e.clientX
+    startY = e.clientY
+    svg.style.cursor = 'grabbing'
+  })
+
+  // panning: move
+  svg.addEventListener('mousemove', function (e) {
+    if (!isDragging) return
+
+    let dx = (startX - e.clientX)
+    let dy = (startY - e.clientY)
+
+    vb.x += dx
+    vb.y += dy
+
+    startX = e.clientX
+    startY = e.clientY
+  })
+
+  // panning: release
+  svg.addEventListener('mouseup', function () {
+    isDragging = false
+    svg.style.cursor = 'grab'
+  })
+
+  // panning: auto release if out of bounds
+  svg.addEventListener('mouseleave', function () {
+    isDragging = false
+    svg.style.cursor = 'grab'
+  })
+}
+
 ////////////////////////////////////////////
 //////////////// main logic ////////////////
 ////////////////////////////////////////////
@@ -64,6 +108,9 @@ async function main() {
 
   // initialize viewbox to see entire graph
   fitGraphToPage(dom_svg, dom_g)
+
+  // interactivity
+  addControlPanning(dom_svg)
 }
 
 // when dom is loaded execute js
