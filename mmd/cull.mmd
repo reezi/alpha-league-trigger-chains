@@ -1,10 +1,7 @@
-stateDiagram
-direction LR
-
-time --> passive
-passive --> damage_dealt
-passive --> mana
-passive --> heal_self
-ultimate_hit --> vulnerable_enemy: death grip (ultimate)
-passive --> vulnerable_enemy: countdown (trait)
-normal_attack_hit --> passive: candlelight (trait)
+time --> passive: life drain (cull)
+passive --> damage_dealt: life drain (cull)
+passive --> mana: life drain (cull)
+passive --> heal_self: life drain (cull)
+ultimate_hit --> vulnerable_enemy: death grip (cull)
+passive --> vulnerable_enemy: countdown (cull,trait)
+normal_attack_hit --> passive: candlelight (cull,trait)
