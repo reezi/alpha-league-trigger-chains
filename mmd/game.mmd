@@ -1,0 +1,31 @@
+%% pedantic name: display name
+combat_start: as combat begins
+damage_dealt: deal damage
+dodge_hit: dodge a hit
+frost_enemy: apply frost
+heal_self: heal yourself
+innerfire_self: gain innerfire
+lethal_damage_taken: cheat death
+magic_damage_taken: take magic damage
+mana: gain mana
+mech_destroyed_self: your drone dies
+normal_attack_hit: land a normal attack
+physical_damage_taken: take physical damage
+shield_self: gain shield
+toxin_damage_taken: take poison damage
+toxin_enemy: apply poison
+true_damage_taken: take true damage
+ultimate_cast: cast your ultimate
+ultimate_hit: land your ultimate
+vulnerable_enemy: apply vulnerable
+
+%% default mechanics
+time --> mana
+physical_damage_taken --> mana
+magic_damage_taken --> mana
+toxin_damage_taken --> mana
+true_damage_taken --> mana
+mana --> ultimate_cast
+time --> normal_attack_hit
+normal_attack_hit --> damage_dealt
+damage_dealt --> crit
