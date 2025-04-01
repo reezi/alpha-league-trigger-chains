@@ -11,8 +11,6 @@ direction LR
 %% looks: classic,handDrawn
 %% themes: default,neutral,dark,forest,base
 
-%% todo: on_damage_dealt procs shoud be on_hit instead?
-
 %% pedantic name: display name
 combat_start: as combat begins
 damage_dealt: deal damage
@@ -34,6 +32,7 @@ ultimate_cast: cast your ultimate
 ultimate_hit: land your ultimate
 vulnerable_enemy: apply vulnerable
 
+%% default mechanics
 time --> mana
 physical_damage_taken --> mana
 magic_damage_taken --> mana
@@ -46,7 +45,9 @@ damage_dealt --> crit
 
 time --> damage_dealt: wind missile (weaponry)
 normal_attack_hit --> heal_self: spear of healing (weaponry,heal)
-normal_attack_hit --> shield_self: fierce counter (weaponrymech_destroyed_selfweaponry,vulnerable)
+normal_attack_hit --> shield_self: fierce counter (weaponry,shield)
+normal_attack_hit --> innerfire_self: wild power (weaponry,innerfire)
+normal_attack_hit --> vulnerable_enemy: devouring blade (weaponry,vulnerable)
 normal_attack_hit --> frost_enemy: iceblade storm (weaponry,frost)
 normal_attack_hit --> toxin_enemy: poison claw (weaponry,toxin)
 
@@ -55,7 +56,7 @@ damage_dealt --> mana: magic mark (spell)
 ultimate_cast --> mana: magic surge (spell)
 ultimate_cast --> heal_self: heal spring (spell,heal)
 ultimate_cast --> shield_self: mana shield (spell,shield)
-ultimate_cast --> innerfire_self: holifire tattoo (spell,innerfire)
+ultimate_cast --> innerfire_self: holyfire tattoo (spell,innerfire)
 ultimate_cast --> vulnerable_enemy: spell sharpness (spell,vulnerable)
 ultimate_cast --> frost_enemy: frost magic ball (spell,frost)
 ultimate_cast --> toxin_enemy: toxin magic ball (spell,toxin)
