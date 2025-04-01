@@ -114,6 +114,63 @@ function px2svg(svg, point) {
   return pointSvg
 }
 
+////////////////////////////////////////
+//////////////// filter ////////////////
+////////////////////////////////////////
+
+function showFilterInput() {
+  const dom_div = document.querySelector('div#diagram')
+  const dom_filteri = document.querySelector("input#filter")
+  dom_div.classList.add('greyed-out')
+  dom_filteri.style.display = 'block'
+  dom_filteri.focus()
+}
+
+function hideFilterInput() {
+  const dom_div = document.querySelector('div#diagram')
+  const dom_filteri = document.querySelector("input#filter")
+  dom_filteri.style.display = 'none'
+  dom_div.classList.remove('greyed-out')
+}
+
+function handleFilterSubmit() {
+  const dom_filteri = document.querySelector("input#filter")
+  const userInput = dom_filteri.value.trim()
+  if (userInput) { modifyFilter(userInput) }
+  dom_filteri.value = "" // reset field to empty
+}
+
+function modifyFilter(word) {
+  filter.has(word) ? filter.delete(word) : filter.add(word)
+  console.log([...filter].join(","))
+  main()
+}
+
+document.addEventListener('keydown', (e) => {
+  const dom_filteri = document.querySelector("input#filter")
+  switch (e.key) {
+    case "Enter":
+      if (window.getComputedStyle(dom_filteri).display === "none") { // enter to prompt
+        showFilterInput()
+      }
+      else { // enter to submit
+        hideFilterInput()
+        handleFilterSubmit()
+      }
+      break
+    case "Escape":
+      hideFilterInput()
+      break
+  }
+})
+
+document.addEventListener('click', (e) => {
+  const dom_filteri = document.querySelector("input#filter")
+  if (!dom_filteri.contains(e.target)) { // click outside of filter input field
+    hideFilterInput()
+  }
+})
+
 /////////////////////////////////////////
 //////////////// panning ////////////////
 /////////////////////////////////////////
