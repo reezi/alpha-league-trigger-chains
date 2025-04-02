@@ -86,6 +86,15 @@ function keepMMDLinePredicate(line) {
   return !transition || hero || genre
 }
 
+async function getFilteredMMD() {
+  // load graph definition
+  const base = await loadMMD("header", "game")
+  const lobby = await loadMMD(...allGenres, ...allHeroes)
+  let mmd = base + filterMMD(lobby)
+  mmd = mmd.replace(/ *%%.*/g, "") // remove comments
+  return mmd
+}
+
 //////////////////////////////////////////////
 //////////////// svg handling ////////////////
 //////////////////////////////////////////////
@@ -114,62 +123,91 @@ function px2svg(svg, point) {
   return pointSvg
 }
 
+async function mmd2svg(mmd) {
+  const { svg } = await mermaid.render('svg', mmd)
+  return svg
+}
+
+async function displayGraph() {
+
+  // get graph definition as a string
+  const mmd = await getFilteredMMD()
+
+  // render mmd string as svg
+  const svg = await mmd2svg(mmd)
+
+  // inject svg into html dom
+  const dom_div = document.querySelector('div#diagram')
+  dom_div.innerHTML = svg
+  const dom_svg = document.querySelector('div#diagram svg')
+  const dom_g = document.querySelector("div#diagram svg g")
+
+  // initialize viewbox to see entire graph
+  fitGraphToPage(dom_svg, dom_g)
+
+  // interactivity: panning and zooming
+  addControlPanning(dom_svg)
+  addControlZooming(dom_svg)
+
+  return dom_svg
+}
+
 ////////////////////////////////////////
 //////////////// filter ////////////////
 ////////////////////////////////////////
 
-function showFilterInput() {
-  const dom_div = document.querySelector('div#diagram')
-  const dom_filteri = document.querySelector("input#filter")
-  dom_div.classList.add('greyed-out')
-  dom_filteri.style.display = 'block'
-  dom_filteri.focus()
+function showFilterInput(dom_d, dom_f) {
+  dom_d.classList.add('greyed-out')
+  dom_f.style.display = 'block'
+  dom_f.focus()
 }
 
-function hideFilterInput() {
-  const dom_div = document.querySelector('div#diagram')
-  const dom_filteri = document.querySelector("input#filter")
-  dom_filteri.style.display = 'none'
-  dom_div.classList.remove('greyed-out')
+function hideFilterInput(dom_d, dom_f) {
+  dom_f.style.display = 'none'
+  dom_d.classList.remove('greyed-out')
 }
 
-function handleFilterSubmit() {
-  const dom_filteri = document.querySelector("input#filter")
-  const userInput = dom_filteri.value.trim()
+function handleFilterSubmit(dom_f) {
+  const userInput = dom_f.value.trim()
   if (userInput) { modifyFilter(userInput) }
-  dom_filteri.value = "" // reset field to empty
+  dom_f.value = "" // reset field to empty
 }
 
 function modifyFilter(word) {
   filter.has(word) ? filter.delete(word) : filter.add(word)
   console.log([...filter].join(","))
-  main()
+  displayGraph()
 }
 
-document.addEventListener('keydown', (e) => {
-  const dom_filteri = document.querySelector("input#filter")
+function handleKeyDown(e, dom_d, dom_f) {
   switch (e.key) {
     case "Enter":
-      if (window.getComputedStyle(dom_filteri).display === "none") { // enter to prompt
-        showFilterInput()
+      if (window.getComputedStyle(dom_f).display === "none") { // enter to prompt
+        showFilterInput(dom_d, dom_f)
       }
       else { // enter to submit
-        hideFilterInput()
-        handleFilterSubmit()
+        hideFilterInput(dom_d, dom_f)
+        handleFilterSubmit(dom_f)
       }
       break
     case "Escape":
-      hideFilterInput()
+      hideFilterInput(dom_d, dom_f)
       break
   }
-})
+}
 
-document.addEventListener('click', (e) => {
-  const dom_filteri = document.querySelector("input#filter")
-  if (!dom_filteri.contains(e.target)) { // click outside of filter input field
-    hideFilterInput()
-  }
-})
+function addControlFiltering(dom_d, dom_f) {
+
+  // filter: show, submit
+  document.addEventListener('keydown', (e) => handleKeyDown(e, dom_d, dom_f))
+
+  // filter: exit
+  document.addEventListener('click', (e) => {
+    if (!dom_f.contains(e.target)) { // click outside of filter input field
+      hideFilterInput(dom_d, dom_f)
+    }
+  })
+}
 
 /////////////////////////////////////////
 //////////////// panning ////////////////
@@ -247,26 +285,14 @@ async function main() {
 
   // initialize
   mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' })
-
-  // load graph definition
-  const base = await loadMMD("header", "game")
-  const lobby = await loadMMD(...allGenres, ...allHeroes)
-  let mmd = base + filterMMD(lobby)
-  mmd = mmd.replace(/ *%%.*/g, "") // remove comments
-
-  // inject svg into html dom
-  const { svg } = await mermaid.render('svg', mmd)
   const dom_div = document.querySelector('div#diagram')
-  dom_div.innerHTML = svg
-  const dom_svg = document.querySelector('div#diagram svg')
-  const dom_g = document.querySelector("div#diagram svg g")
 
-  // initialize viewbox to see entire graph
-  fitGraphToPage(dom_svg, dom_g)
+  // get the star of the show on stage
+  const dom_svg = await displayGraph()
 
-  // interactivity
-  addControlPanning(dom_svg)
-  addControlZooming(dom_svg)
+  // interactivity: filtering
+  const dom_f = document.querySelector("input#filter")
+  addControlFiltering(dom_div, dom_f)
 }
 
 // when dom is loaded execute js
