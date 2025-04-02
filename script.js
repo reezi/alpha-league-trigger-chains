@@ -8,18 +8,57 @@ import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.mi
 //////////////// graph definition ////////////////
 //////////////////////////////////////////////////
 
-async function getMMD() {
-  let mmd
-  try {
-    const response = await fetch("game.mmd") // from file
-    if (!response.ok) throw new Error(`error http ${response.status} https://http.cat/${response.status}`);
-    mmd = await response.text()
-  } catch (error) {
-    console.error("Error loading Mermaid diagram:", error)
-    mmd = "failed to load diagram"
-  }
-  return mmd
+async function loadMMD(...definitions) {
+  // read corresponding files
+  const results = await Promise.allSettled(definitions.map(
+    filename => fetch(`mmd/${filename}.mmd`).then(r => r.ok ? r.text() : null)
+  ))
+
+  // concatenate contents
+  const contents = results
+    .filter(result => result.status === "fulfilled" && result.value)
+    .map(result => result.value)
+    .join("\n")
+
+  return contents
 }
+
+const allGenres = new Set([
+  "weaponry",
+  "spell",
+  "evasion",
+  "crit",
+  "health",
+  "mech",
+  "heal",
+  "shield",
+  "innerfire",
+  "vulnerable",
+  "frost",
+  "toxin"
+])
+
+const allHeroes = new Set([
+  "yukimura",
+  "alicia",
+  "merlina",
+  "malachite",
+  "moriatee",
+  "james",
+  "sylvie",
+  "kay",
+  "emrald",
+  "jenny",
+  "alloya",
+  "wukong",
+  "cull",
+  "brynhild",
+  "hellsing",
+  "asuka",
+  "jacquelyn",
+  "mina",
+  "samuel"
+])
 
 //////////////////////////////////////////////
 //////////////// svg handling ////////////////
@@ -126,11 +165,14 @@ async function main() {
   // initialize
   mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' })
 
-  // mmd2svg
-  let mmd = await getMMD()
-  const { svg } = await mermaid.render('svg', mmd)
+  // load graph definition
+  const base = await loadMMD("header", "game")
+  const lobby = await loadMMD(...allGenres, ...allHeroes)
+  let mmd = base + lobby
+  mmd = mmd.replace(/ *%%.*/g, "") // remove comments
 
   // inject svg into html dom
+  const { svg } = await mermaid.render('svg', mmd)
   const dom_div = document.querySelector('div#diagram')
   dom_div.innerHTML = svg
   const dom_svg = document.querySelector('div#diagram svg')
