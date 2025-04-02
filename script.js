@@ -60,6 +60,32 @@ const allHeroes = new Set([
   "samuel"
 ])
 
+// by default, select all genres no hero
+let filter = new Set(allGenres)
+
+function filterMMD(mmd) {
+  return mmd.split("\n").filter(line => keepMMDLinePredicate(line)).join("\n")
+}
+
+function keepMMDLinePredicate(line) {
+
+  // is a transition
+  const transition = line.includes("-->")
+
+  // hero is present
+  const hero =
+    [...allHeroes].some(h => RegExp(`\\b${h}\\b`).test(line)) &&
+    [...filter].some(h => RegExp(`\\b${h}\\b`).test(line))
+
+  // genre of skill is present AND not a dual skill from an absent genre
+  const genresToExclude = new Set([...allGenres].filter(e => !filter.has(e)))
+  const genre =
+    [...filter].some(g => RegExp(`\\b${g}\\b`).test(line)) &&
+    ![...genresToExclude].some(g => RegExp(`\\b${g}\\b`).test(line))
+
+  return !transition || hero || genre
+}
+
 //////////////////////////////////////////////
 //////////////// svg handling ////////////////
 //////////////////////////////////////////////
@@ -168,7 +194,7 @@ async function main() {
   // load graph definition
   const base = await loadMMD("header", "game")
   const lobby = await loadMMD(...allGenres, ...allHeroes)
-  let mmd = base + lobby
+  let mmd = base + filterMMD(lobby)
   mmd = mmd.replace(/ *%%.*/g, "") // remove comments
 
   // inject svg into html dom
