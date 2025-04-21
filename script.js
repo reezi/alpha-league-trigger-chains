@@ -74,14 +74,14 @@ function keepMMDLinePredicate(line) {
 
   // hero is present
   const hero =
-    [...allHeroes].some(h => RegExp(`\\b${h}\\b`).test(line)) &&
-    [...filter].some(h => RegExp(`\\b${h}\\b`).test(line))
+    [...allHeroes].some(h => RegExp(`\\(.*${h}.*\\)`).test(line)) &&
+    [...filter].some(h => RegExp(`\\(.*${h}.*\\)`).test(line))
 
   // genre of skill is present AND not a dual skill from an absent genre
   const genresToExclude = new Set([...allGenres].filter(e => !filter.has(e)))
   const genre =
-    [...filter].some(g => RegExp(`\\b${g}\\b`).test(line)) &&
-    ![...genresToExclude].some(g => RegExp(`\\b${g}\\b`).test(line))
+    [...filter].some(g => RegExp(`\\(.*${g}.*\\)`).test(line)) &&
+    ![...genresToExclude].some(g => RegExp(`\\(.*${g}.*\\)`).test(line))
 
   return !transition || hero || genre
 }
