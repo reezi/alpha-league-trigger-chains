@@ -60,8 +60,8 @@ const allHeroes = new Set([
   "samuel"
 ])
 
-// by default, select all genres no hero
-let filter = new Set(allGenres)
+// by default select: all genres, no heroes, all traits
+let filter = new Set([...allGenres, 'trait'])
 
 function filterMMD(mmd) {
   return mmd.split("\n").filter(line => keepMMDLinePredicate(line)).join("\n")
@@ -72,15 +72,19 @@ function keepMMDLinePredicate(line) {
   // is a transition
   const transition = line.includes("-->")
 
-  // hero is present
-  const hero =
-    [...allHeroes].some(h => RegExp(`\\(.*${h}.*\\)`).test(line)) &&
-    [...filter].some(h => RegExp(`\\(.*${h}.*\\)`).test(line))
+  // hero is present, disregard trait questions for now
+  let hero = [...filter].some(f => allHeroes.has(f) && RegExp(`\\(.*${f}.*\\)`).test(line))
+
+  // now we handle hero traits
+  // if we do not want to see traits, and the line is a trait, then we discard the line
+  if(!filter.has('trait')) {
+    hero &&= !RegExp(`\\(.*trait.*\\)`).test(line)
+  }
 
   // genre of skill is present AND not a dual skill from an absent genre
   const genresToExclude = new Set([...allGenres].filter(e => !filter.has(e)))
   const genre =
-    [...filter].some(g => RegExp(`\\(.*${g}.*\\)`).test(line)) &&
+    [...filter].some(g => allGenres.has(g) && RegExp(`\\(.*${g}.*\\)`).test(line)) &&
     ![...genresToExclude].some(g => RegExp(`\\(.*${g}.*\\)`).test(line))
 
   return !transition || hero || genre
